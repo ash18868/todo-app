@@ -1,0 +1,52 @@
+<section class="add-todo">
+    <form class="add-todo-form">
+        <label for="todo-title">Title:</label>
+        <input #title type="text" id="todo-title" name="title" required>
+        <button type="button" (click)="addTodo(title.value); title.value = ''">Add todo</button>
+    </form>
+</section>
+
+
+    @for (todo of (todoService.todo$ | async); track todo.todoId) {
+
+      <div class="todo-card">
+
+        <!-- Todo row -->
+        <div class="card-row">
+          @if (editingTodoId === todo.todoId) {
+            <form class="edit-todo-form" (ngSubmit)="saveTodo(todo)">
+              <input type="text" name="editedTitle" [(ngModel)]="editedTitle" required>
+              <div class="card-actions">
+                <button class="btn-edit" type="submit">Save</button>
+                <button class="btn-delete" type="button" (click)="cancelEdit()">Cancel</button>
+              </div>
+            </form>
+          } @else {
+            <div class="card-content">
+              <label class="todo-title">
+                <input type="checkbox" #completedCheckbox [checked]="todo.completed" (change)="toggleTodoCompleted(todo, completedCheckbox.checked)">
+                {{ todo.title }}
+              </label>
+              <span class="todo-status" [class.done]="todo.completed">
+                {{ todo.completed ? 'Completed' : 'In progress' }}
+              </span>
+            </div>
+            <div class="card-actions">
+              <button class="btn-edit" type="button" (click)="editTodo(todo)">Edit</button>
+              <button class="btn-delete" type="button" (click)="deleteTodo(todo)">Delete</button>
+            </div>
+          }
+        </div>
+
+        <!-- Subtasks nested under this todo -->
+        <div class="subtask-list">
+          <app-subtask [todo]="todo"></app-subtask>
+        </div>
+
+      </div>
+
+    } @empty {
+      <p class="empty-state">No tasks yet. Add one to get started!</p>
+    }
+
+

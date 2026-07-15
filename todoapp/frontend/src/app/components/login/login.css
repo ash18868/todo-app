@@ -1,0 +1,134 @@
+/* ── Page background ── */
+:host {
+  --color-bg:        #355697;   /* dark blue page background */
+  --color-card:      #a8c8e8;   /* light blue card */
+  --color-input-bg:  #ffffff;
+  --color-input-ph:  #888888;   /* placeholder text */
+  --color-text:      #1a2a4a;
+  --color-title:     #ffffff;
+  --color-btn:       #2e5fa3;
+  --color-btn-text:  #ffffff;
+  --color-link:      #2e5fa3;
+  --color-error:     #c0392b;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+}
+
+/* ── Title sits above the card ── */
+h1 {
+  text-align: center;
+  color: var(--color-title);
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+h1.title-inside {
+  color: var(--color-bg);
+  font-size: 3rem;
+  margin-top: 0rem;
+
+}
+
+
+
+/* ── Section centers its children ── */
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Card wraps everything except the title ── */
+form,
+.error-message,
+section > p {
+  background-color: var(--color-card);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 320px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Input fields ── */
+input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: none;
+  border-radius: 999px;         /* bubble / pill shape */
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  font-size: 1rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--color-input-ph);
+}
+
+/* ── Submit button ── */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.65rem;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-btn);
+  color: var(--color-btn-text);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+button[type="submit"]:hover {
+  filter: brightness(1.15);
+}
+
+/* ── Error message ── */
+.error-message {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1.25rem;
+}
+
+/* ── Register link paragraph ── */
+section > p {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  text-align: center;
+  padding: 0.75rem 1.25rem;
+}
+
+section > p a {
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+section > p a:hover {
+  text-decoration: underline;
+}
+
+/* ── Accessible label hide ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+h1.title-inside {
+  color: var(--color-text);
+}

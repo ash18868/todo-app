@@ -1,0 +1,137 @@
+/* ── Page background ── */
+:host {
+  --color-bg:        #6b1a1a;   /* dark red page background */
+  --color-card:      #f0b8b8;   /* light red/pink card */
+  --color-input-bg:  #ffffff;
+  --color-input-ph:  #888888;   /* placeholder text */
+  --color-text:      #3b0a0a;
+  --color-title:     #ffffff;
+  --color-btn:       #a32e2e;
+  --color-btn-text:  #ffffff;
+  --color-link:      #a32e2e;
+  --color-error:     #7b0000;
+  --color-success:   #2e7d32;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+}
+
+/* ── Title sits above the card ── */
+h1 {
+  text-align: center;
+  color: var(--color-title);
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+h1.title-inside {
+  color: var(--color-text);
+  font-size: 3rem;
+  margin-top: 0rem;
+}
+
+/* ── Section centers its children ── */
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Card wraps form, messages, and nav paragraph ── */
+form,
+.error-message,
+.success-message,
+section > p {
+  background-color: var(--color-card);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 320px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Input fields ── */
+input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  font-size: 1rem;
+  box-sizing: border-box;
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--color-input-ph);
+}
+
+/* ── Submit button ── */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.65rem;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-btn);
+  color: var(--color-btn-text);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+button[type="submit"]:hover {
+  filter: brightness(1.15);
+}
+
+/* ── Error message ── */
+.error-message {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1.25rem;
+}
+
+/* ── Success message ── */
+.success-message {
+  color: var(--color-success);
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1.25rem;
+}
+
+/* ── Login link paragraph ── */
+section > p {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  text-align: center;
+  padding: 0.75rem 1.25rem;
+}
+
+section > p a {
+  color: var(--color-link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+section > p a:hover {
+  text-decoration: underline;
+}
+
+/* ── Accessible label hide ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

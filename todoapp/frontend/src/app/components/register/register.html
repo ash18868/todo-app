@@ -1,0 +1,38 @@
+<section aria-labelledby="register-heading">
+  <h1 id="register-heading">To-do or not To-do</h1>
+
+    <!-- 
+       [formGroup]="registerForm" is a property binding that connects this <form> element
+       to the FormGroup instance in the component class. This enables Angular's reactive
+       forms features (value tracking, validation, etc.) on this form.
+       (ngSubmit)="onSubmit()" is an event binding that calls onSubmit() when the form
+       is submitted (button click or Enter key). Angular prevents the default browser
+       submission so the page doesn't reload. 
+    -->
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div>
+      <h1 class="title-inside"> Register </h1>
+    </div>
+    <div>
+      <label class="sr-only" for="username">Username</label>
+      <input id="username" type="text" placeholder="Username" autocomplete="username" formControlName="username" />
+    </div>
+
+    <div>
+      <label class="sr-only" for="password">Password</label>
+      <input id="password" type="password" placeholder="Password" autocomplete="new-password" formControlName="password" />
+    </div>
+
+    <button type="submit">Register</button>
+  </form>
+
+    @if (successMessage()) {
+        <p role="status" class="success-message">{{ successMessage() }}</p>
+    }
+
+    @if (errorMessage()) {
+        <p role="alert" class="error-message">{{ errorMessage() }}</p>
+    }
+
+  <p>Already have an account? <a routerLink="/login">Login here</a></p>
+</section>

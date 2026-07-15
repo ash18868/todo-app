@@ -1,0 +1,122 @@
+:host {
+  display: block;
+}
+
+.add-todo {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem 0;
+}
+
+.add-todo-form,
+.edit-todo-form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 720px;
+}
+
+.add-todo-form {
+  color: var(--color-title);
+}
+
+.add-todo-form input,
+.edit-todo-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+}
+
+.add-todo-form button {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-card);
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.add-todo-form button:hover {
+  filter: brightness(1.08);
+}
+
+.todo-card {
+  background-color: var(--color-card);
+  border-radius: 16px;
+  width: calc(100% - 2rem);
+  max-width: 720px;
+  margin: 1.25rem auto 0;
+  overflow: hidden;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  gap: 1rem;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.todo-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.todo-status {
+  font-size: 0.8rem;
+  color: var(--color-status-wip);
+}
+
+.todo-status.done {
+  color: var(--color-status-done);
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.card-actions button {
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--color-btn-text);
+}
+
+.btn-edit {
+  background-color: var(--color-btn-edit);
+}
+
+.btn-delete {
+  background-color: var(--color-btn-delete);
+}
+
+.card-actions button:hover {
+  filter: brightness(1.15);
+}
+
+.subtask-list {
+  background-color: var(--color-card-inner);
+  padding: 0.75rem 1.5rem;
+}
+
+.empty-state {
+  color: var(--color-title);
+  font-size: 1rem;
+  margin-top: 3rem;
+  text-align: center;
+}

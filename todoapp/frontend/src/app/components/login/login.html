@@ -1,0 +1,26 @@
+<section aria-labelledby="login-heading">
+  <h1 id="login-heading">To-do or not To-do</h1>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div>
+      <h1 class="title-inside" id="login-heading-inside">Login</h1>
+    </div>
+    <div>
+      <label class="sr-only" for="username">Username</label>
+      <input id="username" type="text" placeholder="Username" autocomplete="username" formControlName="username" />
+    </div>
+
+    <div>
+      <label class="sr-only" for="password">Password</label>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" formControlName="password" />
+    </div>
+
+    <button type="submit">Login</button>
+  </form>
+
+  @if (errorMessage()) {
+    <p role="alert" class="error-message">{{ errorMessage() }}</p>
+  }
+
+  <p>Don't have an account? <a routerLink="/register">Register here</a></p>
+</section>
