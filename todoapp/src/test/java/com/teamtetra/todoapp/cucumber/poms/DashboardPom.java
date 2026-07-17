@@ -1,9 +1,15 @@
 package com.teamtetra.todoapp.cucumber.poms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
     
 
 public class DashboardPom {
@@ -45,4 +51,51 @@ public class DashboardPom {
         return todoTitle.getText();
     }
 
+    public void todoExists(String title){
+        findCardByTitle(title);
+    }
+
+    public boolean todoDoesNotExist(String title){
+         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        return wait.until(webDriver -> webDriver.findElements(By.cssSelector(".todo-card"))
+                .stream()
+                .noneMatch(card -> title.equals(card.getAttribute("data-todo-title"))));
+    }
+
+    public void clickEditButton(String title){
+        WebElement card = findCardByTitle(title);
+        card.findElement(By.cssSelector(".card-row > .card-actions .btn-edit")).click();
+    }
+
+    public void editTodoTitle(String newTitle){
+        WebElement editTitleInput = driver.findElement(By.name("editedTitle"));
+        editTitleInput.clear();
+        editTitleInput.sendKeys(newTitle);
+    }
+
+    public void clickSaveButton(){
+        //Find the save button
+        WebElement saveButton = driver.findElement(By.id("save-btn"));
+        saveButton.click();
+    }
+
+    public WebElement findCardByTitle(String title){
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
+        return wait.until(webDriver -> webDriver.findElements(By.cssSelector(".todo-card"))
+            .stream()
+            .filter(card -> title.equals(card.getAttribute("data-todo-title")))
+            .findFirst()
+            .orElse(null));
+    }
+
+    public void clickCancelButton(){
+        WebElement cancelButton = driver.findElement(By.id("cancel-btn"));
+        cancelButton.click();
+    }
+
+    public void clickDeleteButton(String title){
+        WebElement card = findCardByTitle(title);
+        card.findElement(By.cssSelector(".card-row > .card-actions .btn-delete")).click();
+    }
 }

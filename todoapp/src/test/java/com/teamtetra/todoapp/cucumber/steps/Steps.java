@@ -125,7 +125,46 @@ public class Steps {
 
     @Then("The todo {string} should appear in the todo list")
     public void The_todo_should_appear_in_the_todo_list(String title) {
-        assertEquals(title, dashboardPom.getTodoTitle());
+        //assertEquals(title, dashboardPom.getTodoTitle());
+        dashboardPom.todoExists(title);
     }
-  
+
+    @Then("The user has an existing todo {string}")
+    public void The_user_has_an_existing_todo(String title) {
+        assertEquals("Log out?", dashboardPom.getLogoutLink());
+        dashboardPom.enterTodoTitle(title);
+        dashboardPom.clickAddTodoButton();
+        dashboardPom.todoExists(title);
+    }
+
+    @When("The user clicks the Edit button on the {string} todo")
+    public void The_user_clicks_the_Edit_button_on_the_todo(String title) {
+        dashboardPom.clickEditButton(title);
+    }
+
+    @When("The user clears and enters {string} in the edit todo field")
+    public void The_user_clears_and_enters_in_the_edit_todo_field(String newTitle) {
+        dashboardPom.editTodoTitle(newTitle);
+    }
+
+    @When("The user clicks the Save button on the todo")
+    public void The_user_clicks_the_Save_button_on_the_todo() {
+        dashboardPom.clickSaveButton();
+    }
+
+    @Then("The todo {string} should no longer appear in the todo list")
+    public void The_todo_should_no_longer_appear_in_the_todo_list(String title) {
+        assertEquals(true, dashboardPom.todoDoesNotExist(title));
+    }
+
+    @When("The user clicks the Cancel button on the todo")
+    public void The_user_clicks_the_Cancel_button_on_the_todo() {
+        dashboardPom.clickCancelButton();
+    }
+
+    @When("The user clicks the Delete button on the {string} todo")
+    public void The_user_clicks_the_Delete_button_on_the_todo(String title) {
+        dashboardPom.clickDeleteButton(title);
+    }
+
 }
