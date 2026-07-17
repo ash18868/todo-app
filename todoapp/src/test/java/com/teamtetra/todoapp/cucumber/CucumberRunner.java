@@ -3,7 +3,9 @@ package com.teamtetra.todoapp.cucumber;
 import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
 import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 
+import com.teamtetra.todoapp.cucumber.poms.LoginPom;
 import com.teamtetra.todoapp.cucumber.poms.RegistrationPom;
+
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.spring.CucumberContextConfiguration;
@@ -36,6 +38,7 @@ public class CucumberRunner {
   public WebDriver driver;// this object will control our web interactions
   
   private RegistrationPom registrationPom;// this object will facilitate registration page actions
+  private LoginPom loginPom;
 
   private static boolean setupDone = false;
 
@@ -47,8 +50,7 @@ public class CucumberRunner {
 
     driver = new ChromeDriver(options);// This initializes a web driver that interacts with Chrome
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));// This tells Selenium to wait up to the given time for an element to be found on the web page
-    registrationPom = new RegistrationPom(driver);
-
+//    registrationPom = new RegistrationPom(driver);
     
   }
 
@@ -71,5 +73,9 @@ public class CucumberRunner {
 
   public RegistrationPom getRegistrationPom() {
     return registrationPom;
+  }
+
+  public LoginPom getLoginPom() {
+    return loginPom;
   }
 }

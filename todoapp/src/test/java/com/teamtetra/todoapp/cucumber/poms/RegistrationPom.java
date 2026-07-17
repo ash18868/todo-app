@@ -22,8 +22,14 @@ public class RegistrationPom {
   @FindBy(id = "password")
   private WebElement passwordInput;
 
+  @FindBy(className = "success-message")
+  private WebElement successMessage;
+
   @FindBy(className = "error-message")
-  private WebElement statusMessage;
+  private WebElement errorMessage;
+
+  @FindBy(tagName = "button")
+  private WebElement submitButton;
 
   public RegistrationPom(WebDriver driver) {
     this.driver = driver;
@@ -50,7 +56,15 @@ public class RegistrationPom {
     passwordInput.sendKeys(password);
   }
 
-  public String getStatusMessage() {
-    return statusMessage.getText();
+  public String getSuccessMessage() {
+    return successMessage.getText();
+  }
+
+  public String getErrorMessage() {
+    return errorMessage.getText();
+  }
+
+  public void clickSubmitButton() {
+    submitButton.click();
   }
 }

@@ -31,7 +31,7 @@
     }
 
     @if (errorMessage()) {
-        <p role="alert" class="error-message">{{ errorMessage() }}</p>
+        <p role="status" class="error-message">{{ errorMessage() }}</p>
     }
 
   <p>Already have an account? <a routerLink="/login">Login here</a></p>

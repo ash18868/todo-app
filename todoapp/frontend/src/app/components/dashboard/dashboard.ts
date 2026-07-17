@@ -10,7 +10,7 @@ import { Todo } from "../todo/todo";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, AsyncPipe, FormsModule, Subtask, Todo],
+  imports: [FormsModule, Todo],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

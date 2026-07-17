@@ -1,8 +1,10 @@
+<!-- Todo: Move this to Dashboard component-->
+ <!-- Todo: User needs to not be able to add empty todo-->
 <section class="add-todo">
     <form class="add-todo-form">
         <label for="todo-title">Title:</label>
         <input #title type="text" id="todo-title" name="title" required>
-        <button type="button" (click)="addTodo(title.value); title.value = ''">Add todo</button>
+        <button id="btn-add" type="button" (click)="addTodo(title.value); title.value = ''">Add todo</button>
     </form>
 </section>
 
@@ -11,7 +13,7 @@
 
       <div class="todo-card">
 
-        <!-- Todo row -->
+        <!-- To-do row -->
         <div class="card-row">
           @if (editingTodoId === todo.todoId) {
             <form class="edit-todo-form" (ngSubmit)="saveTodo(todo)">
