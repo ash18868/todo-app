@@ -4,12 +4,12 @@
     Background: all users navigate to the registration page
         Given   The user is on the login page
         When    The user clicks the registration link
-@current
+
     Scenario: Users can register with valid credentials
         And     The user enters username "Username" and password "P0ssword"
         And     The user clicks the register button
         Then    The user should see a success message
-@current
+
     Scenario Outline: Users can not register with invalid credentials
         And     The user enters username "<username>" and password "<password>"
         And     The user clicks the register button

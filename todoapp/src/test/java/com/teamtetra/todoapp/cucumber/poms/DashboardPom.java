@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -35,8 +36,8 @@ public class DashboardPom {
 
     }
 
-    public String getLogoutLink() {
-        return logoutLink.getText();
+    public void seeLogoutLink() {
+        assertEquals("Log out?", logoutLink.getText());
     }
 
     public void enterTodoTitle(String title){
@@ -52,19 +53,20 @@ public class DashboardPom {
     }
 
     public void todoExists(String title){
-        findCardByTitle(title);
+        findTodoCardByTitle(title);
     }
 
-    public boolean todoDoesNotExist(String title){
-         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-        return wait.until(webDriver -> webDriver.findElements(By.cssSelector(".todo-card"))
+    public void todoDoesNotExist(String title){
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.ignoring(StaleElementReferenceException.class);
+        boolean check = wait.until(webDriver -> webDriver.findElements(By.cssSelector(".todo-card"))
                 .stream()
                 .noneMatch(card -> title.equals(card.getAttribute("data-todo-title"))));
+        assertEquals(true, check);
     }
 
-    public void clickEditButton(String title){
-        WebElement card = findCardByTitle(title);
+    public void clickTodoEditButton(String title){
+        WebElement card = findTodoCardByTitle(title);
         card.findElement(By.cssSelector(".card-row > .card-actions .btn-edit")).click();
     }
 
@@ -80,11 +82,20 @@ public class DashboardPom {
         saveButton.click();
     }
 
-    public WebElement findCardByTitle(String title){
+    public WebElement findTodoCardByTitle(String title){
         WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
         return wait.until(webDriver -> webDriver.findElements(By.cssSelector(".todo-card"))
             .stream()
             .filter(card -> title.equals(card.getAttribute("data-todo-title")))
+            .findFirst()
+            .orElse(null));
+    }
+
+    public WebElement findSubtaskCardByTitle(String title){
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
+        return wait.until(webDriver -> webDriver.findElements(By.cssSelector(".subtask-card"))
+            .stream()
+            .filter(card -> title.equals(card.getAttribute("data-subtask-title")))
             .findFirst()
             .orElse(null));
     }
@@ -94,8 +105,52 @@ public class DashboardPom {
         cancelButton.click();
     }
 
-    public void clickDeleteButton(String title){
-        WebElement card = findCardByTitle(title);
+    public void clickTodoDeleteButton(String title){
+        WebElement card = findTodoCardByTitle(title);
         card.findElement(By.cssSelector(".card-row > .card-actions .btn-delete")).click();
+    }
+
+    public void enterSubtaskTitle(String todoTitle, String subtaskTitle){
+        WebElement card = findTodoCardByTitle(todoTitle);
+        WebElement subtaskTitleInput = card.findElement(By.id("title"));
+        subtaskTitleInput.sendKeys(subtaskTitle);
+    }
+
+    public void clickAddSubtaskButton(String todoTitle){
+        WebElement card = findTodoCardByTitle(todoTitle);
+        WebElement addSubtaskButton = card.findElement(By.id("add-subtask-btn"));
+        addSubtaskButton.click();
+    }
+
+    public void subtaskExists(String subtaskTitle, String todoTitle){
+        WebElement card = findTodoCardByTitle(todoTitle);
+        WebElement subtask = findSubtaskCardByTitle(subtaskTitle);
+        assertEquals(subtaskTitle, subtask.getAttribute("data-subtask-title"));
+    }
+
+    public void clickSubtaskEditButton(String subtaskTitle){
+        WebElement card = findSubtaskCardByTitle(subtaskTitle);
+        WebElement editButton = card.findElement(By.className("btn-edit"));
+        editButton.click();
+    }
+
+    public void editSubtaskTitle(String newSubtaskTitle){
+        WebElement editTitleInput = driver.findElement(By.name("editedTitle"));
+        editTitleInput.clear();
+        editTitleInput.sendKeys(newSubtaskTitle);
+    }
+
+    public void subtaskDoesNotExist(String subtaskTitle){
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.ignoring(StaleElementReferenceException.class);
+        boolean check = wait.until(webDriver -> webDriver.findElements(By.cssSelector(".subtask-card"))
+                .stream()
+                .noneMatch(card -> subtaskTitle.equals(card.getAttribute("data-subtask-title"))));
+        assertEquals(true, check);
+    }
+
+    public void clickSubtaskDeleteButton(String subtaskTitle){
+        WebElement card = findSubtaskCardByTitle(subtaskTitle);
+        card.findElement(By.className("btn-delete")).click();
     }
 }

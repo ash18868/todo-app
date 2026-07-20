@@ -1,5 +1,7 @@
 package com.teamtetra.todoapp.cucumber.poms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -36,8 +38,8 @@ public class LoginPom {
         passwordInput.sendKeys(password);
     }
 
-    public String getStatusMessage() {
-        return statusMessage.getText();
+    public void seeStatusMessage(String error) {
+        assertEquals(error, statusMessage.getText());
     }
 
     public void clickSubmitButton() {

@@ -1,34 +1,15 @@
 package com.teamtetra.todoapp.cucumber.steps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.List;
-
 import com.teamtetra.todoapp.cucumber.CucumberRunner;
 import com.teamtetra.todoapp.cucumber.poms.LoginPom;
 import com.teamtetra.todoapp.cucumber.poms.RegistrationPom;
 import com.teamtetra.todoapp.cucumber.poms.DashboardPom;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.BeforeAll;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Steps {
 
@@ -56,7 +37,7 @@ public class Steps {
             driver.get("http://localhost:4200/register");
             registrationPom.enterCredentials("test-user", "Password1!");
             registrationPom.clickSubmitButton();
-            assertEquals("Registration successful!", registrationPom.getSuccessMessage());
+            registrationPom.seeSuccessMessage();
             setupDone = true;
         }
     }
@@ -78,7 +59,7 @@ public class Steps {
     
     @Then("The user should see a success message")
     public void the_user_should_see_a_success_message() {
-        assertEquals("Registration successful!", registrationPom.getSuccessMessage());
+        registrationPom.seeSuccessMessage();
     }
 
     @Then("The user enters username {string} and password {string}")
@@ -88,12 +69,12 @@ public class Steps {
 
     @Then("The user should see registration failure message {string}")
     public void The_user_should_see_registration_failure_message(String error) {
-        assertEquals(error, registrationPom.getErrorMessage());
+        registrationPom.seeErrorMessage(error);
     }
 
     @Then("The user should see login failure message {string}")
     public void The_user_should_see_login_failure_message(String error) {
-        assertEquals(error, loginPom.getStatusMessage());
+        loginPom.seeStatusMessage(error);
     }
 
     @When("The user clicks the login button")
@@ -103,7 +84,7 @@ public class Steps {
 
     @Then("The user should be navigated to the dashboard")
     public void The_user_should_be_navigated_to_the_dashboard() {
-        assertEquals("Log out?", dashboardPom.getLogoutLink());
+        dashboardPom.seeLogoutLink();
     }
 
     @Given("The user is logged in with valid credentials")
@@ -125,13 +106,12 @@ public class Steps {
 
     @Then("The todo {string} should appear in the todo list")
     public void The_todo_should_appear_in_the_todo_list(String title) {
-        //assertEquals(title, dashboardPom.getTodoTitle());
         dashboardPom.todoExists(title);
     }
 
     @Then("The user has an existing todo {string}")
     public void The_user_has_an_existing_todo(String title) {
-        assertEquals("Log out?", dashboardPom.getLogoutLink());
+        dashboardPom.seeLogoutLink();
         dashboardPom.enterTodoTitle(title);
         dashboardPom.clickAddTodoButton();
         dashboardPom.todoExists(title);
@@ -139,7 +119,7 @@ public class Steps {
 
     @When("The user clicks the Edit button on the {string} todo")
     public void The_user_clicks_the_Edit_button_on_the_todo(String title) {
-        dashboardPom.clickEditButton(title);
+        dashboardPom.clickTodoEditButton(title);
     }
 
     @When("The user clears and enters {string} in the edit todo field")
@@ -154,7 +134,7 @@ public class Steps {
 
     @Then("The todo {string} should no longer appear in the todo list")
     public void The_todo_should_no_longer_appear_in_the_todo_list(String title) {
-        assertEquals(true, dashboardPom.todoDoesNotExist(title));
+        dashboardPom.todoDoesNotExist(title);
     }
 
     @When("The user clicks the Cancel button on the todo")
@@ -164,7 +144,59 @@ public class Steps {
 
     @When("The user clicks the Delete button on the {string} todo")
     public void The_user_clicks_the_Delete_button_on_the_todo(String title) {
-        dashboardPom.clickDeleteButton(title);
+        dashboardPom.clickTodoDeleteButton(title);
+    }
+
+    @When("The user enters {string} in the subtask title field for the {string} todo")
+    public void The_user_enters_in_the_subtask_title_field_for_the_todo(String subtaskTitle, String todoTitle) {
+        dashboardPom.enterSubtaskTitle(todoTitle, subtaskTitle);
+    }
+
+    @When("The user clicks the Add subtask button for the {string} todo")
+    public void The_user_clicks_the_Add_subtask_button_for_the_todo(String todoTitle) {
+        dashboardPom.clickAddSubtaskButton(todoTitle);
+    }
+
+    @Then("The subtask {string} should appear under the {string} todo")
+    public void The_subtask_should_appear_under_the_todo(String subtaskTitle, String todoTitle) {
+        dashboardPom.subtaskExists(subtaskTitle, todoTitle);
+    }
+
+    @Then("The user has an existing subtask {string} under {string}")
+    public void The_user_has_an_existing_subtask_under(String subtaskTitle, String todoTitle) {
+        dashboardPom.enterSubtaskTitle(todoTitle, subtaskTitle);
+        dashboardPom.clickAddSubtaskButton(todoTitle);
+        dashboardPom.subtaskExists(subtaskTitle, todoTitle);
+    }
+
+    @When("The user clicks the Edit button on the {string} subtask")
+    public void The_user_clicks_the_Edit_button_on_the_subtask(String subtaskTitle) {
+        dashboardPom.clickSubtaskEditButton(subtaskTitle);
+    }
+
+    @When("The user clears and enters {string} in the edit subtask field")
+    public void The_user_clears_and_enters_in_the_edit_subtask_field(String newSubtaskTitle) {
+        dashboardPom.editSubtaskTitle(newSubtaskTitle);
+    }
+
+    @When("The user clicks the Save button on the subtask")
+    public void The_user_clicks_the_Save_button_on_the_subtask() {
+        dashboardPom.clickSaveButton();
+    }
+
+    @Then("The subtask {string} should no longer appear under the {string} todo")
+    public void The_subtask_should_no_longer_appear_under_the_todo(String subtaskTitle, String todoTitle) {
+        dashboardPom.subtaskDoesNotExist(subtaskTitle);
+    }
+
+    @When("The user clicks the Cancel button on the subtask")
+    public void The_user_clicks_the_Cancel_button_on_the_subtask() {
+        dashboardPom.clickCancelButton();
+    }
+
+    @When("The user clicks the Delete button on the {string} subtask")
+    public void The_user_clicks_the_Delete_button_on_the_subtask(String subtaskTitle) {
+        dashboardPom.clickSubtaskDeleteButton(subtaskTitle);
     }
 
 }

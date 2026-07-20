@@ -28,7 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 @SelectPackages({"features", "com.teamtetra.todoapp.cucumber"}) // This tells junit to include the features directory of "resources" and the steps package as part of the suite
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.teamtetra.todoapp.cucumber") // This tells CUCUMBER where the code associated with the acceptance criteria is located
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "html:reports/cucumber-report.html") // This tells Cucumber to create an html test report
-@ConfigurationParameter(key = "cucumber.filter.tags", value = "@current")
+//@ConfigurationParameter(key = "cucumber.filter.tags", value = "@current")
 @CucumberContextConfiguration // This tells Spring to manage dependency injection for Cucumber
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT) // spins up the application web server for testing
 @TestPropertySource(locations = "classpath:test.properties") // tells Spring to use our test properties
@@ -37,8 +37,6 @@ public class CucumberRunner {
   
   public WebDriver driver;// this object will control our web interactions
   
-  private RegistrationPom registrationPom;// this object will facilitate registration page actions
-  private LoginPom loginPom;
 
   private static boolean setupDone = false;
 
@@ -50,7 +48,6 @@ public class CucumberRunner {
 
     driver = new ChromeDriver(options);// This initializes a web driver that interacts with Chrome
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));// This tells Selenium to wait up to the given time for an element to be found on the web page
-//    registrationPom = new RegistrationPom(driver);
     
   }
 
@@ -71,11 +68,4 @@ public class CucumberRunner {
     return driver;
   }
 
-  public RegistrationPom getRegistrationPom() {
-    return registrationPom;
-  }
-
-  public LoginPom getLoginPom() {
-    return loginPom;
-  }
 }

@@ -1,19 +1,19 @@
 <form class="add-subtask-form">
     <label for="title">Title:</label>
     <input #title type="text" id="title" name="title" required>
-    <button type="button" (click)="addSubtask(title.value); title.value = ''">Add subtask</button>
+    <button id="add-subtask-btn" type="button" (click)="addSubtask(title.value); title.value = ''">Add subtask</button>
 </form>
 
 @if(subtasks$ | async; as subtasks){
     <ul>
     @for (subtask of subtasks; track subtask.subtaskId) {
-        <li>
+        <li class="subtask-card" [attr.data-subtask-title]="subtask.title">
             @if (editingSubtaskId === subtask.subtaskId) {
                 <form class="edit-subtask-form" (ngSubmit)="saveSubtask(subtask)">
                     <input type="text" name="editedTitle" [(ngModel)]="editedTitle" required >
                     <div class="subtask-actions">
-                        <button class="btn-edit" type="submit">Save</button>
-                        <button class="btn-delete" type="button" (click)="cancelEdit()">Cancel</button>
+                        <button id="save-btn" class="btn-edit" type="submit">Save</button>
+                        <button id="cancel-btn" class="btn-delete" type="button" (click)="cancelEdit()">Cancel</button>
                     </div>
                 </form>
             } @else {
