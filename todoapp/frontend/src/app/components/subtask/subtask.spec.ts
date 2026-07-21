@@ -12,6 +12,13 @@ describe('Subtask', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(Subtask);
+
+    fixture.componentRef.setInput('todo', {
+      todoId: 1,
+      title: 'Test todo',
+      completed: false,
+    });
+
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

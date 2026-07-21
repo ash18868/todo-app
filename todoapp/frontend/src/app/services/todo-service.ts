@@ -22,16 +22,17 @@ export class TodoService {
     }
 
 
-    getTodos() {
-        this.http.get<TodoModel[]>(`${this.apiBaseUrl}/todo`,)
+    getTodos(): Observable<TodoModel[]> {
+    return this.http
+        .get<TodoModel[]>(`${this.apiBaseUrl}/todo`)
         .pipe(
-            tap(todoData => this.todoSubject.next(todoData)),
-            catchError(error => {
-                console.log(`Something went wrong: ${error}`)
-                this.todoSubject.next(this.emptyTodos)
-                return of(null);
-            })
-        ).subscribe()
+        tap(todos => this.todoSubject.next(todos)),
+        catchError(error => {
+            console.error('Failed to load todos:', error);
+            this.todoSubject.next([]);
+            return of([]);
+        }),
+        );
     }
 
     addTodo(todo: Partial<TodoModel>) {

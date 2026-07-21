@@ -1,4 +1,5 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit, OnDestroy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SubtaskService } from '../../services/subtask-service';
 import { AsyncPipe } from '@angular/common';
 import { SubtaskModel } from '../../models/subtask-model';
@@ -12,9 +13,11 @@ import { Observable } from 'rxjs';
   templateUrl: './subtask.html',
   styleUrl: './subtask.css',
 })
-export class Subtask implements OnInit {
+export class Subtask implements OnInit, OnDestroy {
 
-  @Input() todo!: TodoModel;
+  private readonly destroyRef = inject(DestroyRef);
+
+  @Input() todo!: TodoModel; //Comes in from the parent todo in <app-subtask>
 
   subtaskService = inject(SubtaskService);
   subtasks$!: Observable<SubtaskModel[]>;
@@ -23,25 +26,43 @@ export class Subtask implements OnInit {
   editedTitle = '';
 
   ngOnInit(): void {
-    this.subtasks$ = this.subtaskService.getSubjectForTodo(this.todo.todoId);
-    this.subtaskService.getSubtasks(this.todo);
+    this.subtasks$ =
+      this.subtaskService.getSubjectForTodo(this.todo.todoId);
+
+    this.refreshSubtasks();
+  }
+
+  private refreshSubtasks(): void {
+    this.subtaskService
+      .getSubtasks(this.todo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subtaskService.clearSubtasksForTodo(this.todo.todoId);
   }
 
   addSubtask(title: string): void {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) { // Catches empty todo
+      return;
+    }
+
     const subtask: Partial<SubtaskModel> = {
       todoId: this.todo.todoId,
-      title: title,
+      title: trimmedTitle,
       completed: false
     };
-    this.subtaskService.addSubtask(subtask).subscribe(() => {
-      this.subtaskService.getSubtasks(this.todo);
-    });
+    this.subtaskService.addSubtask(subtask)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshSubtasks());
   }
 
   deleteSubtask(subtask: SubtaskModel): void {
-    this.subtaskService.deleteSubtask(subtask).subscribe(() => {
-      this.subtaskService.getSubtasks(this.todo);
-    });
+    this.subtaskService.deleteSubtask(subtask)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshSubtasks());
   }
 
   editSubtask(subtask: SubtaskModel): void {
@@ -54,11 +75,13 @@ export class Subtask implements OnInit {
       ...subtask,
       title: this.editedTitle
     };
-    this.subtaskService.updateSubtask(updatedSubtask).subscribe(() => {
-      this.editingSubtaskId = null;
-      this.editedTitle = '';
-      this.subtaskService.getSubtasks(this.todo);
-    });
+    this.subtaskService.updateSubtask(updatedSubtask)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.editingSubtaskId = null;
+        this.editedTitle = '';
+        this.refreshSubtasks();
+      });
   }
 
   cancelEdit(): void {
@@ -71,9 +94,8 @@ export class Subtask implements OnInit {
       ...subtask,
       completed: completed
     };
-    this.subtaskService.updateSubtask(updatedSubtask).subscribe(() => {
-      this.subtaskService.getSubtasks(this.todo);
-    });
+    this.subtaskService.updateSubtask(updatedSubtask)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshSubtasks());
   }
-
 }

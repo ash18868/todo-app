@@ -65,14 +65,7 @@ public class TodoService {
         if (userRepo.findByUserId(userId).isPresent())
         {
             List<Todo> todoList = todoRepo.findByUserId(userId);
-
-            if (todoList.isEmpty())
-            {
-                throw new AddTodoFailure("Could not find any todos for matching user id" + userId);
-            }
-            else{
-                return todoList;
-            }
+            return todoList;
         }
         else{
             throw new AddTodoFailure("Could not find matching user id");

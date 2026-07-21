@@ -19,7 +19,7 @@ export class Register {
   // In the template, we bind it to a <form> element with [formGroup]="registerForm",
   // which is what enables (ngSubmit) to fire when the form is submitted.
   // Each FormControl inside holds the value for one input field (initialized to '').
-    registerForm = new FormGroup({
+  registerForm = new FormGroup({
     username: new FormControl(''),
     password: new FormControl(''),
   });
@@ -65,7 +65,15 @@ export class Register {
       },
       error: (err) => {
         // Display the error message returned by the backend, or a generic fallback
-        const message = typeof err.error === 'string' ? err.error : (err.error?.message ?? 'An unexpected error occurred');
+        let message: string;
+
+        if (typeof err.error === 'string') {
+          message = err.error;
+        } else if (err.error?.message != null) {
+          message = err.error.message;
+        } else {
+          message = 'An unexpected error occurred';
+        }
         this.errorMessage.set(message);
       },
     });

@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TodoService } from '../../services/todo-service';
 import { AsyncPipe } from '@angular/common';
 import { TodoModel } from '../../models/todo-model';
@@ -13,29 +14,45 @@ import { Subtask } from "../subtask/subtask";
 })
 export class Todo implements OnInit{
 
+  private readonly destroyRef = inject(DestroyRef);
+
   todoService = inject(TodoService)
 
   editingTodoId: number | null = null;
   editedTitle = '';
 
   ngOnInit(): void {
-    this.todoService.getTodos();
+    this.refreshTodos();
+  }
+
+  private refreshTodos(): void {
+    this.todoService
+      .getTodos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   addTodo(title: string){
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) { // Catches empty todo
+      return;
+    }
+
     const todo: Partial<TodoModel> = {
-      title: title,
+      title: trimmedTitle,
       completed: false
     };
-    this.todoService.addTodo(todo).subscribe(() => {
-      this.todoService.getTodos();
-    });
+    
+    this.todoService
+      .addTodo(todo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshTodos());
   }
 
   deleteTodo(todo: TodoModel){
-    this.todoService.deleteTodo(todo).subscribe(() => {
-      this.todoService.getTodos();
-    });
+    this.todoService.deleteTodo(todo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshTodos());
   }
 
   editTodo(todo: TodoModel) {
@@ -48,11 +65,13 @@ export class Todo implements OnInit{
       ...todo,
       title: this.editedTitle
     };
-    this.todoService.updateTodo(updatedTodo).subscribe(() => {
-      this.editingTodoId = null;
-      this.editedTitle = '';
-      this.todoService.getTodos();
-    });
+    this.todoService.updateTodo(updatedTodo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.editingTodoId = null;
+        this.editedTitle = '';
+        this.refreshTodos();
+      });
   }
 
   cancelEdit() {
@@ -66,9 +85,9 @@ export class Todo implements OnInit{
       completed: completed
     };
 
-    this.todoService.updateTodo(updatedTodo).subscribe(() => {
-      this.todoService.getTodos();
-    });
+    this.todoService.updateTodo(updatedTodo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshTodos());
   }
 
 }

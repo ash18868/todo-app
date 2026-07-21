@@ -97,11 +97,13 @@
   color: var(--color-btn-text);
 }
 
-.btn-edit {
+.btn-edit,
+.btn-save {
   background-color: var(--color-btn-edit);
 }
 
-.btn-delete {
+.btn-delete,
+.btn-cancel {
   background-color: var(--color-btn-delete);
 }
 

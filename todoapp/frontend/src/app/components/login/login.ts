@@ -35,10 +35,15 @@ export class Login {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        const message =
-          typeof err.error === 'string'
-            ? err.error
-            : (err.error?.message ?? 'Invalid credentials. Please try again.');
+        let message: string;
+
+        if (typeof err.error === 'string') {
+          message = err.error;
+        } else if (err.error?.message != null) {
+          message = err.error.message;
+        } else {
+          message = 'Invalid credentials. Please try again.';
+        }
         this.errorMessage.set(message);
       },
     });

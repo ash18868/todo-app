@@ -57,14 +57,11 @@ public class SubtaskService {
 
     public List<Subtask> getSubtasks(Long todoId){
 
-        //check for existing user
-        if (todoRepo.findByTodoId(todoId).isPresent())
-        {
-            return subtaskRepo.findByTodoId(todoId);
-        }
-        else{
+        if (todoRepo.findByTodoId(todoId).isEmpty()) {
             throw new AddSubtaskFailure("Could not find matching todo id");
         }
+
+        return subtaskRepo.findByTodoId(todoId);
 
     }
 

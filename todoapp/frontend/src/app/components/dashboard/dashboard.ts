@@ -29,70 +29,13 @@ export class Dashboard implements OnInit {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.username = payload.username ?? 'User';
         const userId = Number(payload.sub);
-        this.todoService.getTodos();
       } catch {
         this.username = 'User';
       }
     }
   }
 
-  addTodo(title: string): void {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) {
-      return;
-    }
-
-    const todo: Partial<TodoModel> = {
-      title: trimmedTitle,
-      completed: false
-    };
-
-    this.todoService.addTodo(todo).subscribe(() => {
-      this.todoService.getTodos();
-    });
-  }
-
-  editTodo(todo: TodoModel): void {
-    this.editingTodoId = todo.todoId;
-    this.editedTitle = todo.title;
-  }
-
-  saveTodo(todo: TodoModel): void {
-    const updatedTodo: TodoModel = {
-      ...todo,
-      title: this.editedTitle
-    };
-
-    this.todoService.updateTodo(updatedTodo).subscribe(() => {
-      this.editingTodoId = null;
-      this.editedTitle = '';
-      this.todoService.getTodos();
-    });
-  }
-
-  cancelEdit(): void {
-    this.editingTodoId = null;
-    this.editedTitle = '';
-  }
-
-  deleteTodo(todo: TodoModel): void {
-    this.todoService.deleteTodo(todo).subscribe(() => {
-      this.todoService.getTodos();
-    });
-  }
-
-  toggleTodoCompleted(todo: TodoModel, completed: boolean): void {
-    const updatedTodo: TodoModel = {
-      ...todo,
-      completed: completed
-    };
-
-    this.todoService.updateTodo(updatedTodo).subscribe(() => {
-      this.todoService.getTodos();
-    });
-  }
-
-    logout(): void {
-  this.authService.logout();
+  logout(): void {
+    this.authService.logout();
   }
 }

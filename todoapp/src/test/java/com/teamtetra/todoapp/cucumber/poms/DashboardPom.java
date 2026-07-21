@@ -78,7 +78,7 @@ public class DashboardPom {
 
     public void clickSaveButton(){
         //Find the save button
-        WebElement saveButton = driver.findElement(By.id("save-btn"));
+        WebElement saveButton = driver.findElement(By.className("btn-save"));
         saveButton.click();
     }
 
@@ -101,7 +101,7 @@ public class DashboardPom {
     }
 
     public void clickCancelButton(){
-        WebElement cancelButton = driver.findElement(By.id("cancel-btn"));
+        WebElement cancelButton = driver.findElement(By.className("btn-cancel"));
         cancelButton.click();
     }
 

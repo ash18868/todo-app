@@ -21,17 +21,25 @@ export class SubtaskService {
         return this.subtasksByTodo.get(todoId)!.asObservable();
     }
 
-    getSubtasks(todo: TodoModel): void {
-        this.http.get<SubtaskModel[]>(`${this.apiBaseUrl}/subtask`, { params: { todoId: todo.todoId } })
+    getSubtasks(todo: TodoModel): Observable<SubtaskModel[]> {
+        return this.http
+            .get<SubtaskModel[]>(`${this.apiBaseUrl}/subtask`, {
+                params: { todoId: todo.todoId },
+            })
             .pipe(
-                tap(subtaskData => this.getOrCreateSubject(todo.todoId).next(subtaskData)),
-                // Backend returns 400 when there are no subtasks — treat it as empty list
+                tap(subtasks => {
+                    this.getOrCreateSubject(todo.todoId).next(subtasks);
+                }),
                 catchError(error => {
-                    console.log(`No subtasks or error for todo ${todo.todoId}:`, error);
+                    console.error(
+                    `Failed to load subtasks for todo ${todo.todoId}:`,
+                    error,
+                    );
+
                     this.getOrCreateSubject(todo.todoId).next([]);
-                    return of(null);
-                })
-            ).subscribe();
+                    return of([]);
+                }),
+            );
     }
 
     addSubtask(subtask: Partial<SubtaskModel>): Observable<SubtaskModel> {
@@ -44,6 +52,15 @@ export class SubtaskService {
 
     updateSubtask(subtask: SubtaskModel): Observable<void> {
         return this.http.put<void>(`${this.apiBaseUrl}/subtask`, subtask);
+    }
+
+    clearSubtasksForTodo(todoId: number): void {
+        const subject = this.subtasksByTodo.get(todoId);
+
+        if (subject) {
+            subject.complete();
+            this.subtasksByTodo.delete(todoId);
+        }
     }
 
     private getOrCreateSubject(todoId: number): BehaviorSubject<SubtaskModel[]> {
