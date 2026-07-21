@@ -18,3 +18,4 @@ Feature: Edit Subtask
         When    The user clicks the Edit button on the "Gather trash" subtask
         And     The user clicks the Cancel button on the subtask
         Then    The subtask "Gather trash" should appear under the "Take out trash" todo
+    #Todo User cannot edit subtasks to make duplicate subtasks under the same todo

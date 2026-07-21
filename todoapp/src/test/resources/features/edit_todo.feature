@@ -17,3 +17,4 @@ Feature: Edit Todo
         When    The user clicks the Edit button on the "Buy groceries" todo
         And     The user clicks the Cancel button on the todo
         Then    The todo "Buy groceries" should appear in the todo list
+    #Todo User cannot edit todos to make duplicate todos

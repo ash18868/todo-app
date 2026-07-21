@@ -10,3 +10,4 @@ Feature: Create Subtask
         When    The user enters "Buy soap" in the subtask title field for the "Wash car" todo
         And     The user clicks the Add subtask button for the "Wash car" todo
         Then    The subtask "Buy soap" should appear under the "Wash car" todo
+    #Todo User cannot add duplicate todos

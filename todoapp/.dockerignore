@@ -1,0 +1,37 @@
+# Gradle-generated files and local caches
+.gradle/
+build/
+bin/
+
+# The frontend is built by its own Docker image
+frontend/
+
+# Test and generated reports
+reports/
+test-results/
+
+# Local application data
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Editor and operating-system metadata
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Docker and repository metadata are not needed in the image
+.git/
+.gitignore
+.gitattributes
+.dockerignore
+Dockerfile
+docker-compose*.yml
+compose*.yml

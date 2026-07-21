@@ -25,6 +25,9 @@ public class TodoService {
         if (userRepo.findByUserId(userId).isPresent())
         {
             todo.setUserId(userId);
+            if(todoRepo.findByTitle(todo.getTitle()).isPresent()){
+                throw new AddTodoFailure("Todo already exists");
+            }
             todoRepo.save(todo);
         }
         else{

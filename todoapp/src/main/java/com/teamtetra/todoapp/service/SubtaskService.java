@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.teamtetra.todoapp.entity.Subtask;
 import com.teamtetra.todoapp.exception.AddSubtaskFailure;
+import com.teamtetra.todoapp.exception.AddTodoFailure;
 import com.teamtetra.todoapp.repo.SubtaskRepo;
 import com.teamtetra.todoapp.repo.TodoRepo;
 
@@ -23,6 +24,9 @@ public class SubtaskService {
         //check for existing user
         if (todoRepo.findByTodoId(subtask.getTodoId()).isPresent())
         {
+            if(subtaskRepo.findByTitle(subtask.getTitle()).isPresent()){
+                throw new AddTodoFailure("Subtask already exists");
+            }
             subtaskRepo.save(subtask);
         }
         else{

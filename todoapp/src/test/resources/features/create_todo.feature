@@ -9,3 +9,4 @@ Feature: Create Todo
         When    The user enters "Clean cat litter" in the todo title field
         And     The user clicks the Add todo button
         Then    The todo "Clean cat litter" should appear in the todo list
+    #Todo User cannot add duplicate todos
