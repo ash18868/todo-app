@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -49,7 +50,7 @@ export class Register {
     //              rather than just the parsed body
     //     responseType: 'text' tells Angular to treat the response body as plain text
     //                   instead of attempting to parse it as JSON
-    this.http.post('http://localhost:8080/register', body, { observe: 'response', responseType: 'text' }).subscribe({
+    this.http.post(`${environment.apiBaseUrl}/register`, body, { observe: 'response', responseType: 'text' }).subscribe({
       // .subscribe() triggers the HTTP request and lets us handle the result.
       // http.post() returns an Observable — it won't execute until subscribed to.
       // The object passed to subscribe() is an Observer with callback functions:

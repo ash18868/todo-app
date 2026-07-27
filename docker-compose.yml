@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
 
   frontend:
     build:
@@ -12,5 +14,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:80"
+    environment:
+      BACKEND_HOST: backend
+      BACKEND_PORT: "8080"
     depends_on:
       - backend
