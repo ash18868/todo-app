@@ -87,3 +87,4 @@ todoapp/frontend/node_modules/
 # Environment files (contain secrets/local config)
 todoapp/frontend/src/environments/environment.development.ts
 todoapp/frontend/src/environments/environment.ts
+todoapp/.env

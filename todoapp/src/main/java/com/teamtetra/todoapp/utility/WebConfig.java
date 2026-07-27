@@ -43,7 +43,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")          // protect everything by default
                 .excludePathPatterns(            // public routes that don't need a token
                         "/register",
-                        "/login"
+                        "/login",
+                        "/error"
                 );
     }
 }

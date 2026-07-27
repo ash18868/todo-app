@@ -7,16 +7,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.teamtetra.todoapp.entity.Subtask;
+import com.teamtetra.todoapp.dto.CreateSubtaskRequest;
+import com.teamtetra.todoapp.dto.SubtaskResponse;
+import com.teamtetra.todoapp.dto.UpdateSubtaskRequest;
 import com.teamtetra.todoapp.exception.AddSubtaskFailure;
 import com.teamtetra.todoapp.service.SubtaskService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,28 +29,28 @@ public class SubtaskController {
 
     private final SubtaskService subtaskService;
 
-    @PostMapping("/subtask")
-    public ResponseEntity<Void> addSubtask(@RequestBody Subtask subtask){
-        subtaskService.addSubtask(subtask);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    @PostMapping("/todo/{todoId}/subtask")
+    public ResponseEntity<SubtaskResponse> addSubtask(@PathVariable Long todoId, @Valid @RequestBody CreateSubtaskRequest requestBody, HttpServletRequest request){
+        SubtaskResponse response = subtaskService.addSubtask(todoId, requestBody, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @DeleteMapping("/subtask")
-    public ResponseEntity<Void> deleteSubtask(@RequestBody Subtask subtask){
-        subtaskService.deleteSubtask(subtask);
+    @DeleteMapping("/todo/{todoId}/subtask/{subtaskId}")
+    public ResponseEntity<Void> deleteSubtask(@PathVariable Long todoId, @PathVariable Long subtaskId, HttpServletRequest request){
+        subtaskService.deleteSubtask(todoId, subtaskId, request);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @PutMapping("/subtask")
-    public ResponseEntity<Void> updateSubtask(@RequestBody Subtask subtask){
-        subtaskService.updateSubtask(subtask);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+    @PutMapping("/todo/{todoId}/subtask/{subtaskId}")
+    public ResponseEntity<SubtaskResponse> updateSubtask(@PathVariable Long todoId, @PathVariable Long subtaskId, @Valid @RequestBody UpdateSubtaskRequest requestBody, HttpServletRequest request){
+        SubtaskResponse response = subtaskService.updateSubtask(todoId, subtaskId, requestBody, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/subtask")
-    public ResponseEntity<List<Subtask>> getSubtasks(@RequestParam Long todoId){
-        List<Subtask> subtaskList = subtaskService.getSubtasks(todoId);
-        return ResponseEntity.status(HttpStatus.OK).body(subtaskList);
+    @GetMapping("/todo/{todoId}/subtask")
+    public ResponseEntity<List<SubtaskResponse>> getSubtasks(@PathVariable Long todoId, HttpServletRequest request){
+        List<SubtaskResponse> responses = subtaskService.getSubtasks(todoId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
     @ExceptionHandler(AddSubtaskFailure.class)

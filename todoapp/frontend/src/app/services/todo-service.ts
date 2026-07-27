@@ -39,12 +39,19 @@ export class TodoService {
         return this.http.post<TodoModel>(`${this.apiBaseUrl}/todo`, todo);
     }
 
-    deleteTodo(todo: TodoModel){
-        return this.http.delete<void>(`${this.apiBaseUrl}/todo`, {
-            body: todo
-        });
+    deleteTodo(todo: TodoModel): Observable<void> {
+        return this.http.delete<void>(
+            `${this.apiBaseUrl}/todo/${todo.todoId}`,
+        );
     }
-    updateTodo(todo: TodoModel){
-        return this.http.put<void>(`${this.apiBaseUrl}/todo`, todo);
+
+    updateTodo(todo: TodoModel): Observable<TodoModel> {
+        return this.http.put<TodoModel>(
+            `${this.apiBaseUrl}/todo/${todo.todoId}`,
+            {
+                title: todo.title,
+                completed: todo.completed,
+            },
+        );
     }
 }

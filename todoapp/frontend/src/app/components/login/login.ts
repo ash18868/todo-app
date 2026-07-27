@@ -29,9 +29,8 @@ export class Login {
     const password = this.loginForm.value.password ?? '';
 
     this.authService.login(username, password).subscribe({
-      next: (token) => {
-        // Store the JWT returned in the response body
-        this.authService.setToken(token);
+      next: (response) => {
+        this.authService.setToken(response.token);
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

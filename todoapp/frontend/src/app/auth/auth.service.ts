@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthResponse } from '../models/auth-response';
 
 /**
  * Central authentication service responsible for managing user login state.
@@ -29,7 +30,7 @@ export class AuthService {
    * and calling `setToken()` with the result.
    */
   login(username: string, password: string) {
-    return this.http.post('http://localhost:8080/login', { username, password }, { responseType: 'text' });
+    return this.http.post<AuthResponse>('http://localhost:8080/login', { username, password });
   }
 
   /** Store the token in memory and localStorage */

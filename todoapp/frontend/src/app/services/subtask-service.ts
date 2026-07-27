@@ -23,9 +23,9 @@ export class SubtaskService {
 
     getSubtasks(todo: TodoModel): Observable<SubtaskModel[]> {
         return this.http
-            .get<SubtaskModel[]>(`${this.apiBaseUrl}/subtask`, {
-                params: { todoId: todo.todoId },
-            })
+            .get<SubtaskModel[]>(
+                `${this.apiBaseUrl}/todo/${todo.todoId}/subtask`,
+            )
             .pipe(
                 tap(subtasks => {
                     this.getOrCreateSubject(todo.todoId).next(subtasks);
@@ -43,15 +43,26 @@ export class SubtaskService {
     }
 
     addSubtask(subtask: Partial<SubtaskModel>): Observable<SubtaskModel> {
-        return this.http.post<SubtaskModel>(`${this.apiBaseUrl}/subtask`, subtask);
+        return this.http.post<SubtaskModel>(
+            `${this.apiBaseUrl}/todo/${subtask.todoId}/subtask`,
+            { title: subtask.title },
+        );
     }
 
     deleteSubtask(subtask: SubtaskModel): Observable<void> {
-        return this.http.delete<void>(`${this.apiBaseUrl}/subtask`, { body: subtask });
+        return this.http.delete<void>(
+            `${this.apiBaseUrl}/todo/${subtask.todoId}/subtask/${subtask.subtaskId}`,
+        );
     }
 
-    updateSubtask(subtask: SubtaskModel): Observable<void> {
-        return this.http.put<void>(`${this.apiBaseUrl}/subtask`, subtask);
+    updateSubtask(subtask: SubtaskModel): Observable<SubtaskModel> {
+        return this.http.put<SubtaskModel>(
+            `${this.apiBaseUrl}/todo/${subtask.todoId}/subtask/${subtask.subtaskId}`,
+            {
+                title: subtask.title,
+                completed: subtask.completed,
+            },
+        );
     }
 
     clearSubtasksForTodo(todoId: number): void {

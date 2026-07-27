@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.teamtetra.todoapp.entity.User;
@@ -16,8 +17,11 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtility {
-    private final String SECRET = "this-works-for-dev-use-environemnt-in-prod";
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private final SecretKey key;
+
+    public JwtUtility(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(User user){
         return Jwts.builder()

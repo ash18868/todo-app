@@ -14,4 +14,5 @@ public interface TodoRepo extends JpaRepository<Todo, Long> {
     //Can be changed to return Integer if that is more appropriate for todo_id
     Optional<Todo> findByTitle(String credential);
     Optional<Todo> findByTodoId(Long todoId);
+    Optional<Todo> findByTodoIdAndUserId(Long todoId, Long userId);
 }

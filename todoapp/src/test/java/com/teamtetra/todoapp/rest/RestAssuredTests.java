@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import com.teamtetra.todoapp.entity.Subtask;
@@ -33,11 +34,16 @@ public class RestAssuredTests {
     private TodoRepo todoRepo;
     @Autowired
     private SubtaskRepo subtaskRepo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Shared test objects — initialised fresh before each test in setup()
     private User testUser;
+    private User loginCredentials;
     private Todo testTodo;
+    private Todo testAddTodo;
     private Subtask testSubtask;
+    private Subtask testAddSubtask;
     private String token;
 
     @BeforeEach
@@ -55,17 +61,33 @@ public class RestAssuredTests {
         // Pre-seed a user so login/todo tests have someone to work with
         testUser = new User();
         testUser.setUsername("T3ster");
-        testUser.setPassword("P0ssword");
+        testUser.setPassword(passwordEncoder.encode("P0ssword!"));
         userRepo.save(testUser);
 
+        loginCredentials = new User();
+        loginCredentials.setUsername("T3ster");
+        loginCredentials.setPassword("P0ssword!");
+
+        testAddTodo = new Todo();
+        testAddTodo.setUserId(testUser.getUserId());
+        testAddTodo.setTitle("Implement my REST assured addTodo test");
+        testAddTodo.setCompleted(false);
+
+        // Pre-seed a todo so update/delete todo tests have a todo to work with
         testTodo = new Todo();
         testTodo.setUserId(testUser.getUserId());
-        testTodo.setTitle("Implement my REST assured test");
+        testTodo.setTitle("Implement the rest of my REST assured tests");
         testTodo.setCompleted(false);
         Todo savedTodo = todoRepo.save(testTodo);
 
+        testAddSubtask = new Subtask();
+        testAddSubtask.setTitle("Implement my REST assured addSubtask test");
+        testAddSubtask.setTodoId(savedTodo.getTodoId());
+        testAddSubtask.setCompleted(false);
+
+        // Pre-seed a subtask so update/delete subtask tests have a subtask to work with
         testSubtask = new Subtask();
-        testSubtask.setTitle("wash dishes");
+        testSubtask.setTitle("Implement the rest of my REST assured tests");
         testSubtask.setTodoId(savedTodo.getTodoId());
         testSubtask.setCompleted(false);
         subtaskRepo.save(testSubtask);
@@ -73,12 +95,12 @@ public class RestAssuredTests {
         // Log in once and store the token — available to all tests via the token field
         token = given()
             .contentType(ContentType.JSON)
-            .body(testUser)
+            .body(loginCredentials)
         .when()
             .post("/login")
         .then()
-            .statusCode(200)
-            .extract().asString(); // response body is the raw JWT string
+            .statusCode(202)
+            .extract().path("token");
     }
     
     //--------------------------
@@ -90,7 +112,7 @@ public class RestAssuredTests {
         // Use a different username than testUser ("T3ster") to avoid duplicate conflict
         User newUser = new User();
         newUser.setUsername("NewUser1");
-        newUser.setPassword("P0ssword");
+        newUser.setPassword("P0ssword!");
 
         given()
             .contentType(ContentType.JSON)
@@ -105,11 +127,11 @@ public class RestAssuredTests {
     void loginTest() {
         given()
             .contentType(ContentType.JSON)
-            .body(testUser)
+            .body(loginCredentials)
         .when()
             .post("/login")
         .then()
-            .statusCode(200);
+            .statusCode(202);
     }
 
     //--------------------------
@@ -120,7 +142,7 @@ public class RestAssuredTests {
         given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
-            .body(testTodo)
+            .body(testAddTodo)
         .when()
             .post("/todo")
         .then()
@@ -135,7 +157,7 @@ public class RestAssuredTests {
             .header("Authorization", "Bearer " + token)
             .body(testTodo)
         .when()
-            .put("/todo")
+            .put("/todo/{todoId}", testTodo.getTodoId())
         .then()
             .statusCode(200);
     }
@@ -158,7 +180,7 @@ public class RestAssuredTests {
             .header("Authorization", "Bearer " + token)
             .body(testTodo)
         .when()
-            .delete("/todo")
+            .delete("/todo/{todoId}", testTodo.getTodoId())
         .then()
             .statusCode(200);
     }
@@ -171,9 +193,9 @@ public class RestAssuredTests {
          given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
-            .body(testSubtask)
+            .body(testAddSubtask)
             .when()
-            .post("/subtask")
+            .post("/todo/{todoId}/subtask", testTodo.getTodoId())
             .then()
             .statusCode(201);
     }
@@ -187,7 +209,11 @@ public class RestAssuredTests {
             .header("Authorization", "Bearer " + token)
             .body(testSubtask)
             .when()
-            .put("/subtask")
+            .put(
+                "/todo/{todoId}/subtask/{subtaskId}",
+                testSubtask.getTodoId(),
+                testSubtask.getSubtaskId()
+            )
             .then()
             .statusCode(200);
     }
@@ -197,9 +223,8 @@ public class RestAssuredTests {
 
          given()
             .header("Authorization", "Bearer " + token)
-            .queryParam("todoId", testSubtask.getTodoId())
         .when()
-            .get("/subtask")
+            .get("/todo/{todoId}/subtask", testSubtask.getTodoId())
         .then()
             .statusCode(200);
     }
@@ -212,7 +237,11 @@ public class RestAssuredTests {
             .header("Authorization", "Bearer " + token)
             .body(testSubtask)
             .when()
-            .delete("/subtask")
+            .delete(
+                "/todo/{todoId}/subtask/{subtaskId}",
+                testSubtask.getTodoId(),
+                testSubtask.getSubtaskId()
+            )
             .then()
             .statusCode(200);
     }

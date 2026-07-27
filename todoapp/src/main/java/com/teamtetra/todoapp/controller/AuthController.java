@@ -7,32 +7,32 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.teamtetra.todoapp.entity.User;
+import com.teamtetra.todoapp.dto.LoginRequest;
+import com.teamtetra.todoapp.dto.RegisterRequest;
+import com.teamtetra.todoapp.dto.AuthResponse;
 import com.teamtetra.todoapp.exception.RegistrationFailure;
 import com.teamtetra.todoapp.exception.LoginFailure;
-import com.teamtetra.todoapp.service.UserService;
-import com.teamtetra.todoapp.utility.JwtUtility;
+import com.teamtetra.todoapp.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class AuthController {
     
-    private final UserService userService;
-    private final JwtUtility jwtUtility;
+    private final AuthService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerNewUser(@RequestBody User user){
-        userService.registerUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    public ResponseEntity<AuthResponse> registerNewUser(@Valid @RequestBody RegisterRequest request){
+        AuthResponse response = userService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User credentials){
-        User user = userService.loginUser(credentials);
-        String token = jwtUtility.generateToken(user);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody LoginRequest request){
+        AuthResponse response = userService.loginUser(request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @ExceptionHandler(RegistrationFailure.class)

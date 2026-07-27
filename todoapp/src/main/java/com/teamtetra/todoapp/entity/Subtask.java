@@ -7,13 +7,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity 
 @Table(name = "subtasks") 
 @Data 
-@NoArgsConstructor 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Subtask {
 
     @Id // Marks this field as the primary key

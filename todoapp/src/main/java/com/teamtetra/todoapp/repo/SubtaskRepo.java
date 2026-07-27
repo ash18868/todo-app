@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.teamtetra.todoapp.entity.Subtask;
+import com.teamtetra.todoapp.entity.Todo;
 
 @Repository
 public interface SubtaskRepo extends JpaRepository<Subtask, Long> {
@@ -14,4 +15,6 @@ public interface SubtaskRepo extends JpaRepository<Subtask, Long> {
     //Can be changed to return Integer if that is more appropriate for todo_id
     Optional<Subtask> findByTitle(String credential);
     void deleteByTodoId(Long todoId);
+    Optional<Subtask> findBySubtaskIdAndTodoId(Long subtaskId, Long todoId);
+    Optional<Subtask> findByTitleAndTodoId(String title, Long todoId);
 }
