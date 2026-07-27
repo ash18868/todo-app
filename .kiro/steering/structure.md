@@ -1,113 +1,104 @@
 # Project Structure
 
-```
-Team4Repository/
-├── todoapp/                        # Main application module
-│   ├── build.gradle.kts            # Gradle build config (Kotlin DSL)
-│   ├── todo.db                     # SQLite database file (auto-created at runtime)
-│   ├── frontend/                   # Angular frontend application
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   │   ├── auth/           # Auth guard, interceptor, and auth service
-│   │   │   │   │   ├── auth.guard.ts
-│   │   │   │   │   ├── auth.interceptor.ts
-│   │   │   │   │   └── auth.service.ts
-│   │   │   │   ├── components/     # Feature components
-│   │   │   │   │   ├── dashboard/
-│   │   │   │   │   ├── login/
-│   │   │   │   │   ├── register/
-│   │   │   │   │   ├── todo/
-│   │   │   │   │   └── subtask/
-│   │   │   │   ├── guards/         # Route guards
-│   │   │   │   ├── models/         # TypeScript interfaces (User, Todo, Subtask)
-│   │   │   │   ├── services/       # Angular services for HTTP calls
-│   │   │   │   ├── app.routes.ts   # Route definitions
-│   │   │   │   ├── app.config.ts   # Application config (providers, etc.)
-│   │   │   │   └── app.ts          # Root app component
-│   │   │   └── index.html
-│   │   ├── angular.json
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   └── src/                        # Spring Boot backend source
-│       ├── main/
-│       │   ├── java/com/teamtetra/todoapp/
-│       │   │   ├── TodoappApplication.java     # Spring Boot entry point
-│       │   │   ├── controller/                 # REST controllers
-│       │   │   │   ├── UserController.java
-│       │   │   │   ├── TodoController.java
-│       │   │   │   └── SubtaskController.java
-│       │   │   ├── service/                    # Business logic
-│       │   │   │   ├── UserService.java
-│       │   │   │   ├── TodoService.java
-│       │   │   │   └── SubtaskService.java
-│       │   │   ├── repo/                       # Spring Data JPA repositories
-│       │   │   │   ├── UserRepo.java
-│       │   │   │   ├── TodoRepo.java
-│       │   │   │   └── SubtaskRepo.java
-│       │   │   ├── entity/                     # JPA entity classes
-│       │   │   │   ├── User.java
-│       │   │   │   ├── Todo.java
-│       │   │   │   └── Subtask.java
-│       │   │   ├── exception/                  # Custom RuntimeException subclasses
-│       │   │   │   ├── RegistrationFailure.java
-│       │   │   │   ├── LoginFailure.java
-│       │   │   │   ├── AddTodoFailure.java
-│       │   │   │   └── AddSubtaskFailure.java
-│       │   │   └── utility/                    # Cross-cutting concerns
-│       │   │       ├── JwtUtility.java         # JWT generation and validation
-│       │   │       ├── AuthInterceptor.java    # Token validation on all protected routes
-│       │   │       └── WebConfig.java          # CORS config and interceptor registration
-│       │   └── resources/
-│       │       └── application.properties
-│       └── test/
-│           ├── java/com/teamtetra/todoapp/
-│           │   ├── TodoappApplicationTests.java
-│           │   ├── cucumber/
-│           │   │   ├── CucumberRunner.java     # JUnit Platform Suite entry point for Cucumber
-│           │   │   └── steps/
-│           │   │       └── Steps.java          # Step definitions for .feature files
-│           │   └── rest/
-│           │       └── RestAssuredTests.java   # Integration tests using REST Assured
-│           └── resources/
-│               ├── features/
-│               │   └── registration.feature   # Cucumber feature files
-│               └── test.properties            # Overrides production config (H2 in-memory DB)
+```text
+.
+|-- .kiro/steering/                 # Product, structure, and technology guidance
+|-- docker-compose.yml              # Local/EC2 frontend and backend orchestration
+|-- README.md
+`-- todoapp/
+    |-- Dockerfile                  # Spring Boot multi-stage image
+    |-- build.gradle.kts
+    |-- src/
+    |   |-- main/
+    |   |   |-- java/com/teamtetra/todoapp/
+    |   |   |   |-- controller/    # Auth, todo, and nested subtask REST endpoints
+    |   |   |   |-- dto/           # Validated request and response records
+    |   |   |   |-- entity/        # User, Todo, and Subtask JPA entities
+    |   |   |   |-- exception/     # Domain and global exception handling
+    |   |   |   |-- repo/          # Ownership-aware Spring Data repositories
+    |   |   |   |-- service/       # Authentication and business logic
+    |   |   |   `-- utility/       # JWT, interceptor, CORS, and password encoder
+    |   |   `-- resources/
+    |   |       `-- application.properties
+    |   `-- test/                   # JUnit, REST Assured, Cucumber, and test config
+    `-- frontend/
+        |-- Dockerfile              # Node build and nginx runtime image
+        |-- nginx.conf.template     # SPA fallback and /api reverse proxy
+        |-- src/
+        |   |-- app/
+        |   |   |-- auth/           # Auth service, guard, and HTTP interceptor
+        |   |   |-- components/     # Login, register, dashboard, todo, subtask
+        |   |   |-- guards/
+        |   |   |-- models/
+        |   |   `-- services/
+        |   `-- environments/
+        |       |-- environment.ts  # Committed public production config (/api)
+        |       `-- environment.development.ts
+        |-- angular.json
+        |-- package.json
+        `-- package-lock.json
 ```
 
-## Architectural Pattern
+## Backend Architecture
 
-Standard Spring layered architecture:
+The backend follows a layered flow:
 
-**Controller → Service → Repository → Entity**
+```text
+Controller -> Service -> Repository -> Entity
+```
 
-- **Controllers** handle HTTP mapping and `@ExceptionHandler` methods for their domain exceptions. They read `userId` from the request attributes set by `AuthInterceptor` (not from the request body). They delegate all logic to the service layer.
-- **Services** contain business logic and validation. They are annotated `@Service` and use `@RequiredArgsConstructor` for dependency injection.
-- **Repositories** are Spring Data JPA interfaces extending `JpaRepository`. Custom finders use Spring's derived query naming (e.g., `findByUserId`).
-- **Entities** are plain JPA classes annotated with `@Entity`, `@Data`, and `@NoArgsConstructor` (Lombok). Primary keys are `Long` fields named `{entity}Id` (e.g., `userId`, `todoId`).
-- **Exceptions** are `RuntimeException` subclasses, one per failure domain. They are thrown in services and caught by `@ExceptionHandler` in controllers.
-- **Utility** classes handle cross-cutting concerns: JWT logic lives in `JwtUtility`, request interception in `AuthInterceptor`, and MVC configuration (CORS + interceptor registration) in `WebConfig`.
+- Controllers map HTTP requests, validate DTOs, and delegate business rules.
+- Services obtain the authenticated user from `AuthService`, enforce ownership,
+  and map entities to response DTOs.
+- Repositories extend `JpaRepository` and use derived ownership-aware queries,
+  such as todo ID plus owning user ID.
+- Entities use `@ManyToOne` relationships: todos belong to users, and subtasks
+  belong to todos.
+- `GlobalExceptionHandler` handles validation failures, while domain handlers
+  return application-specific failures.
 
-## Backend Conventions
+## API Conventions
 
-- Package root: `com.teamtetra.todoapp`
-- New features follow the same four-layer structure: entity → repo → service → controller
-- Each controller handles its own exceptions via `@ExceptionHandler` (no global `@ControllerAdvice` currently)
-- Foreign keys between entities are stored as raw `Long` IDs (e.g., `userId` on `Todo`), not as JPA `@ManyToOne` object references
-- Lombok `@Data` provides getters, setters, `equals`, `hashCode`, and `toString` on all entities
-- `userId` is extracted from the JWT via request attributes (`request.getAttribute("userId")`) — never trust `userId` from the request body on protected endpoints
+- Public authentication routes are `/register` and `/login`.
+- Todo collection routes use `/todo`.
+- Resource mutation routes identify the resource in the path:
+  `/todo/{todoId}`.
+- Subtasks are nested beneath their parent:
+  `/todo/{todoId}/subtask/{subtaskId}`.
+- Request bodies use DTOs and never determine resource ownership.
+- JWT-derived identity is the source of authorization.
+
+## Frontend Architecture
+
+- Angular uses standalone components and signals where appropriate.
+- HTTP behavior is encapsulated in services.
+- The auth interceptor adds bearer tokens.
+- The production API URL is the same-origin `/api` path.
+- nginx serves `index.html` for Angular client-side routes.
+- nginx removes the `/api` prefix and forwards API traffic to Spring Boot.
+
+## Deployment Structure
+
+Docker Compose runs:
+
+1. `frontend`: nginx serving Angular and proxying `/api`.
+2. `backend`: Spring Boot with an ephemeral SQLite database.
+
+The public EC2 deployment is available at http://18.220.129.235/. It currently
+uses HTTP, so visitors must not submit passwords reused on other services.
+
+Planned deployment work:
+
+- Add a stable domain and HTTPS.
+- Bind internal application ports so only the TLS reverse proxy is public.
+- Add Jenkins later for test/build/deploy automation.
 
 ## Testing Conventions
 
-- **REST Assured tests** live in `test/java/.../rest/` and spin up a real Spring Boot context on a random port (`@SpringBootTest(webEnvironment = RANDOM_PORT)`). They use `test.properties` to swap SQLite for H2.
-- **Cucumber tests** use `CucumberRunner` as the JUnit Platform Suite entry point. Feature files live in `test/resources/features/`. Step definitions live in `test/java/.../cucumber/steps/`. HTML reports are generated at `reports/cucumber-report.html`.
-- Test properties (`test.properties`) override the production datasource with an H2 in-memory DB using `create-drop` to ensure isolation.
-
-## Frontend Conventions
-
-- Angular app lives in `todoapp/frontend/` — kept separate from the Spring Boot `src/` directory
-- Uses **Angular 22 standalone component API** — no NgModules
-- Auth-related files (guard, interceptor, service) are co-located in `app/auth/`
-- TypeScript interfaces in `models/` mirror backend entity shapes (`User`, `Todo`, `Subtask`)
-- HTTP calls are encapsulated in Angular services under `services/` — components never call `HttpClient` directly
-- The auth interceptor in `auth/auth.interceptor.ts` attaches the JWT from storage to outgoing requests
-- Backend runs on port 8080 during development; configure the API base URL via Angular's `environment.ts` files
+- Backend integration tests use a random Spring Boot port and H2.
+- Cucumber feature files live under `src/test/resources/features`.
+- Selenium-backed browser scenarios require an available browser environment.
+- Frontend unit tests run once in CI-style mode with
+  `npm test -- --watch=false`.
+- Deployment verification should check `/api/actuator/health` and one
+  authentication flow after containers start.
