@@ -10,6 +10,7 @@ import com.teamtetra.todoapp.dto.SubtaskResponse;
 import com.teamtetra.todoapp.dto.UpdateSubtaskRequest;
 import com.teamtetra.todoapp.dto.UpdateTodoRequest;
 import com.teamtetra.todoapp.entity.Subtask;
+import com.teamtetra.todoapp.entity.Todo;
 import com.teamtetra.todoapp.exception.AddSubtaskFailure;
 import com.teamtetra.todoapp.exception.AddTodoFailure;
 import com.teamtetra.todoapp.repo.SubtaskRepo;
@@ -30,51 +31,48 @@ public class SubtaskService {
 
         // Make sure request has authorization
         Long userId = authService.extractUserId(request);
-        isAuthorized(todoId, userId);
+        Todo todo = getAuthorizedTodo(todoId, userId);
 
         // Build the subtask
         Subtask subtask = Subtask.builder()
-                    .todoId(todoId)
+                    .todo(todo)
                     .title(requestBody.title())
                     .build();
 
         // Make sure subtask doesn't already exist
-        if(subtaskRepo.findByTitle(subtask.getTitle()).isPresent()) {throw new AddSubtaskFailure("Subtask already exists");}
+        if(subtaskRepo.existsByTodo_TodoIdAndTitle(todoId, requestBody.title())) {throw new AddSubtaskFailure("Subtask already exists");}
 
         // Add Subtask to DB
         Subtask savedSubtask = subtaskRepo.save(subtask);
-        return new SubtaskResponse(savedSubtask.getSubtaskId(), savedSubtask.getTodoId(), savedSubtask.getTitle(), savedSubtask.isCompleted()); 
+        return new SubtaskResponse(savedSubtask.getSubtaskId(), savedSubtask.getTodo().getTodoId(), savedSubtask.getTitle(), savedSubtask.isCompleted()); 
 
     }
 
     public void deleteSubtask(Long todoId, Long subtaskId, HttpServletRequest request){
 
-        // Make sure subtask exists
-        Optional<Subtask> subtaskOptional = subtaskRepo.findBySubtaskIdAndTodoId(subtaskId, todoId);
-        if (subtaskOptional.isEmpty()) {throw new AddSubtaskFailure("Subtask does not exist");}
-
-        Subtask subtask = subtaskOptional.get(); // Convert to subtask
-
         // Make sure request has authorization
         Long userId = authService.extractUserId(request);
-        isAuthorized(todoId, userId);
+        getAuthorizedTodo(todoId, userId);
+
+        // Make sure subtask exists underneath its Todo
+        if (!subtaskRepo.existsByTodo_TodoIdAndSubtaskId(todoId, subtaskId)) {throw new AddSubtaskFailure("Subtask does not exist");}    
 
         // Delete subtask
-        subtaskRepo.deleteById(subtask.getSubtaskId());
+        subtaskRepo.deleteById(subtaskId);
     }
 
     public SubtaskResponse updateSubtask(Long todoId, Long subtaskId,  UpdateSubtaskRequest requestBody, HttpServletRequest request){
 
         // Make sure request has authorization
         Long userId = authService.extractUserId(request);
-        isAuthorized(todoId, userId); 
+        Todo todo = getAuthorizedTodo(todoId, userId); 
 
         // Make sure subtask exists
-        Optional<Subtask> optionalSubtask = subtaskRepo.findBySubtaskIdAndTodoId(subtaskId, todoId);
-        if (optionalSubtask.isEmpty()){throw new AddSubtaskFailure("Could not find matching subtask id");}
+        Optional<Subtask> optionalSubtask = subtaskRepo.findBySubtaskIdAndTodo_TodoId(subtaskId, todoId);
+        if(optionalSubtask.isEmpty()){throw new AddSubtaskFailure("Could not find matching subtask id");}
 
         // Make sure another Subtask under that todo doesn't already share the same title
-        if (subtaskRepo.findByTitleAndTodoId(requestBody.title(), todoId).isPresent()) {throw new AddSubtaskFailure("Another subtask already has this title");}
+        if(subtaskRepo.existsByTodo_TodoIdAndTitleAndSubtaskIdNot(todoId, requestBody.title(), subtaskId)) {throw new AddSubtaskFailure("Another subtask already has this title");}
         
         Subtask subtask = optionalSubtask.get(); // Convert to subtask
 
@@ -82,23 +80,23 @@ public class SubtaskService {
         subtask.setTitle(requestBody.title());
         subtask.setCompleted(requestBody.completed());
         Subtask savedSubtask = subtaskRepo.save(subtask);
-        return new SubtaskResponse(savedSubtask.getSubtaskId(), savedSubtask.getTodoId(), savedSubtask.getTitle(), savedSubtask.isCompleted());
+        return new SubtaskResponse(savedSubtask.getSubtaskId(), savedSubtask.getTodo().getTodoId(), savedSubtask.getTitle(), savedSubtask.isCompleted());
     }
 
     public List<SubtaskResponse> getSubtasks(Long todoId, HttpServletRequest request){
 
         // Make sure request has authorization
         Long userId = authService.extractUserId(request);
-        isAuthorized(todoId, userId);
+        Todo todo = getAuthorizedTodo(todoId, userId);
         
         // Fetch todos
-        List<Subtask> subtaskList = subtaskRepo.findByTodoId(todoId);
+        List<Subtask> subtaskList = subtaskRepo.findAllByTodo_TodoId(todoId);
 
         // Stream subtaskList into a list of responses
         return subtaskList.stream()
             .map(subtask -> new SubtaskResponse(
                 subtask.getSubtaskId(),
-                subtask.getTodoId(),
+                todo.getTodoId(),
                 subtask.getTitle(),
                 subtask.isCompleted()
             ))
@@ -106,10 +104,10 @@ public class SubtaskService {
     }
 
     // Helper Method: make sure parent todo exists and verify user is authorized
-    private void isAuthorized(Long todoId, Long userId){
-        if(!(todoRepo.findByTodoIdAndUserId(todoId, userId).isPresent())){
-            throw new AddSubtaskFailure("User is not authorized or parent todo does not exist");
-        }
+    private Todo getAuthorizedTodo(Long todoId, Long userId) {
+    return todoRepo.findByTodoIdAndUser_UserId(todoId, userId)
+        .orElseThrow(() ->
+            new AddSubtaskFailure("User is not authorized or parent todo does not exist"));
     }
 
 }

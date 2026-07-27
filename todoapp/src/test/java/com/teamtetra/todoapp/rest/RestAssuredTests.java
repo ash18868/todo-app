@@ -10,6 +10,10 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
+import com.teamtetra.todoapp.dto.CreateSubtaskRequest;
+import com.teamtetra.todoapp.dto.CreateTodoRequest;
+import com.teamtetra.todoapp.dto.UpdateSubtaskRequest;
+import com.teamtetra.todoapp.dto.UpdateTodoRequest;
 import com.teamtetra.todoapp.entity.Subtask;
 import com.teamtetra.todoapp.entity.User;
 import com.teamtetra.todoapp.entity.Todo;
@@ -41,9 +45,9 @@ public class RestAssuredTests {
     private User testUser;
     private User loginCredentials;
     private Todo testTodo;
-    private Todo testAddTodo;
+    private CreateTodoRequest testAddTodo;
     private Subtask testSubtask;
-    private Subtask testAddSubtask;
+    private CreateSubtaskRequest testAddSubtask;
     private String token;
 
     @BeforeEach
@@ -68,27 +72,25 @@ public class RestAssuredTests {
         loginCredentials.setUsername("T3ster");
         loginCredentials.setPassword("P0ssword!");
 
-        testAddTodo = new Todo();
-        testAddTodo.setUserId(testUser.getUserId());
-        testAddTodo.setTitle("Implement my REST assured addTodo test");
-        testAddTodo.setCompleted(false);
+        testAddTodo = new CreateTodoRequest(
+            "Implement my REST assured addTodo test"
+        );
 
         // Pre-seed a todo so update/delete todo tests have a todo to work with
         testTodo = new Todo();
-        testTodo.setUserId(testUser.getUserId());
+        testTodo.setUser(testUser);
         testTodo.setTitle("Implement the rest of my REST assured tests");
         testTodo.setCompleted(false);
         Todo savedTodo = todoRepo.save(testTodo);
 
-        testAddSubtask = new Subtask();
-        testAddSubtask.setTitle("Implement my REST assured addSubtask test");
-        testAddSubtask.setTodoId(savedTodo.getTodoId());
-        testAddSubtask.setCompleted(false);
+        testAddSubtask = new CreateSubtaskRequest(
+            "Implement my REST assured addSubtask test"
+        );
 
         // Pre-seed a subtask so update/delete subtask tests have a subtask to work with
         testSubtask = new Subtask();
         testSubtask.setTitle("Implement the rest of my REST assured tests");
-        testSubtask.setTodoId(savedTodo.getTodoId());
+        testSubtask.setTodo(savedTodo);
         testSubtask.setCompleted(false);
         subtaskRepo.save(testSubtask);
 
@@ -151,11 +153,15 @@ public class RestAssuredTests {
 
     @Test // Update todo
     void updateTodoTest() {
-        testTodo.setTitle("This is a new title");
+        UpdateTodoRequest updateRequest = new UpdateTodoRequest(
+            "This is a new title",
+            testTodo.isCompleted()
+        );
+
         given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
-            .body(testTodo)
+            .body(updateRequest)
         .when()
             .put("/todo/{todoId}", testTodo.getTodoId())
         .then()
@@ -203,15 +209,19 @@ public class RestAssuredTests {
     @Test 
     void updateSubtaskTest() {
 
-        testSubtask.setTitle("new Title!");
+        UpdateSubtaskRequest updateRequest = new UpdateSubtaskRequest(
+            "new Title!",
+            testSubtask.isCompleted()
+        );
+
          given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
-            .body(testSubtask)
+            .body(updateRequest)
             .when()
             .put(
                 "/todo/{todoId}/subtask/{subtaskId}",
-                testSubtask.getTodoId(),
+                testSubtask.getTodo().getTodoId(),
                 testSubtask.getSubtaskId()
             )
             .then()
@@ -224,7 +234,7 @@ public class RestAssuredTests {
          given()
             .header("Authorization", "Bearer " + token)
         .when()
-            .get("/todo/{todoId}/subtask", testSubtask.getTodoId())
+            .get("/todo/{todoId}/subtask", testSubtask.getTodo().getTodoId())
         .then()
             .statusCode(200);
     }
@@ -239,7 +249,7 @@ public class RestAssuredTests {
             .when()
             .delete(
                 "/todo/{todoId}/subtask/{subtaskId}",
-                testSubtask.getTodoId(),
+                testSubtask.getTodo().getTodoId(),
                 testSubtask.getSubtaskId()
             )
             .then()

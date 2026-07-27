@@ -10,9 +10,8 @@ import com.teamtetra.todoapp.entity.Todo;
 
 @Repository
 public interface TodoRepo extends JpaRepository<Todo, Long> {
-    List<Todo> findByUserId(Long userId);
-    //Can be changed to return Integer if that is more appropriate for todo_id
-    Optional<Todo> findByTitle(String credential);
-    Optional<Todo> findByTodoId(Long todoId);
-    Optional<Todo> findByTodoIdAndUserId(Long todoId, Long userId);
+    List<Todo> findAllByUser_UserId(Long userId);
+    Optional<Todo> findByTodoIdAndUser_UserId(Long todoId, Long userId);
+    boolean existsByUser_UserIdAndTitle(Long userId, String title);
+    boolean existsByUser_UserIdAndTitleAndTodoIdNot(Long userId, String title, Long excludedTodoId);
 }

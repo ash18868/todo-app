@@ -9,6 +9,7 @@ import com.teamtetra.todoapp.dto.CreateTodoRequest;
 import com.teamtetra.todoapp.dto.TodoResponse;
 import com.teamtetra.todoapp.dto.UpdateTodoRequest;
 import com.teamtetra.todoapp.entity.Todo;
+import com.teamtetra.todoapp.entity.User;
 import com.teamtetra.todoapp.exception.AddTodoFailure;
 import com.teamtetra.todoapp.repo.SubtaskRepo;
 import com.teamtetra.todoapp.repo.TodoRepo;
@@ -29,18 +30,18 @@ public class TodoService {
 
     public TodoResponse addTodo(CreateTodoRequest requestBody, HttpServletRequest request){
         
-        //check for existing user
+        // Check for existing user
         Long userId = authService.extractUserId(request);
-        if (!userRepo.findByUserId(userId).isPresent()) {throw new AddTodoFailure("Could not find matching user id");}
+        User user = userRepo.findByUserId(userId).orElseThrow(() -> new AddTodoFailure("Could not find matching user id"));
+
+        // Make sure todo doesn't already exist
+        if(todoRepo.existsByUser_UserIdAndTitle(userId, requestBody.title())) {throw new AddTodoFailure("Todo already exists");}
 
         // Build the todo
         Todo todo = Todo.builder()
-                    .userId(userId)
-                    .title(requestBody.title())
-                    .build();
-
-        // Make sure todo doesn't already exist
-        if(todoRepo.findByTitle(todo.getTitle()).isPresent()) {throw new AddTodoFailure("Todo already exists");}
+            .user(user)
+            .title(requestBody.title())
+            .build();
         
         // Add todo to DB
         Todo savedTodo = todoRepo.save(todo);
@@ -51,10 +52,10 @@ public class TodoService {
     public void deleteTodo(Long todoId, HttpServletRequest request){
 
         // Make sure Todo exists underneath it's user
-        if (!todoRepo.findByTodoIdAndUserId(todoId, authService.extractUserId(request)).isPresent()) {throw new AddTodoFailure("Could not find matching todo id");}
+        if (!todoRepo.findByTodoIdAndUser_UserId(todoId, authService.extractUserId(request)).isPresent()) {throw new AddTodoFailure("Could not find matching todo id");}
         
         // Delete children subtasks
-        subtaskRepo.deleteByTodoId(todoId);
+        subtaskRepo.deleteAllByTodo_TodoId(todoId);
         // Delete todo
         todoRepo.deleteById(todoId);
     }
@@ -62,11 +63,12 @@ public class TodoService {
     public TodoResponse updateTodo(Long todoId, UpdateTodoRequest requestBody, HttpServletRequest request){
 
         // Make sure Todo exists underneath it's user
-        Optional<Todo> optionalTodo = todoRepo.findByTodoIdAndUserId(todoId, authService.extractUserId(request));
+        Optional<Todo> optionalTodo = todoRepo.findByTodoIdAndUser_UserId(todoId, authService.extractUserId(request));
         if (optionalTodo.isEmpty()) {throw new AddTodoFailure("Could not find matching todo id");}
 
         // Make sure another Todo doesn't already share the same title
-        if (todoRepo.findByTitle(requestBody.title()).isPresent()) {throw new AddTodoFailure("Another todo already has this title");}
+        Long userId = authService.extractUserId(request);
+        if (todoRepo.existsByUser_UserIdAndTitleAndTodoIdNot(userId, requestBody.title(), todoId)) {throw new AddTodoFailure("Another todo already has this title");}
 
         Todo todo = optionalTodo.get(); // Convert to Todo
         
@@ -85,7 +87,7 @@ public class TodoService {
         if (!userRepo.findByUserId(userId).isPresent()) {throw new AddTodoFailure("Could not find matching user id");}
         
         // Fetch todos
-        List<Todo> todoList = todoRepo.findByUserId(userId);
+        List<Todo> todoList = todoRepo.findAllByUser_UserId(userId);
 
         // Stream todolist into a list of responses
         return todoList.stream()

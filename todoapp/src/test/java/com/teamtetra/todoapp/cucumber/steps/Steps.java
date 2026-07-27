@@ -11,6 +11,15 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.WebDriver;
 
+
+/*
+TODO: Two different users can both create "Shopping".
+TODO: One user cannot create "Shopping" twice.
+TODO: Two different todos can both contain "Buy milk".
+TODO: One todo cannot contain "Buy milk" twice.
+TODO: Updating without changing the title succeeds.
+TODO: Updating to a sibling’s title fails.
+ */
 public class Steps {
 
     // this will store the driver object

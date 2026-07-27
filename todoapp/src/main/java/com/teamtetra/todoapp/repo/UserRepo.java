@@ -9,6 +9,6 @@ import com.teamtetra.todoapp.entity.User;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, Long> {
-    Optional<User> findByUsername(String credential);
-    Optional<User> findByUserId(Long credential);
+    Optional<User> findByUsername(String username);
+    Optional<User> findByUserId(Long userId);
 }

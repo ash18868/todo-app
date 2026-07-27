@@ -11,10 +11,10 @@ import com.teamtetra.todoapp.entity.Todo;
 
 @Repository
 public interface SubtaskRepo extends JpaRepository<Subtask, Long> {
-    List<Subtask> findByTodoId(Long todoId);
-    //Can be changed to return Integer if that is more appropriate for todo_id
-    Optional<Subtask> findByTitle(String credential);
-    void deleteByTodoId(Long todoId);
-    Optional<Subtask> findBySubtaskIdAndTodoId(Long subtaskId, Long todoId);
-    Optional<Subtask> findByTitleAndTodoId(String title, Long todoId);
+    List<Subtask> findAllByTodo_TodoId(Long todoId);
+    void deleteAllByTodo_TodoId(Long todoId);
+    Optional<Subtask> findBySubtaskIdAndTodo_TodoId(Long subtaskId, Long todoId);
+    boolean existsByTodo_TodoIdAndTitle(Long todoId, String title);
+    boolean existsByTodo_TodoIdAndTitleAndSubtaskIdNot(Long todoId, String title, Long excludedSubtaskId);
+    boolean existsByTodo_TodoIdAndSubtaskId(Long todoId, Long subtaskId);
 }
