@@ -6,15 +6,11 @@ The application is backed by automated Cucumber acceptance tests and REST Assure
 
 ## Live demo
 
-Visit **[http://18.220.129.235/](http://18.220.129.235/)**.
+Visit **[https://todo.webweaver.dev](https://todo.webweaver.dev)**.
 
-> **Security notice:** The demo currently runs over HTTP rather than HTTPS.
-> Please use a unique temporary password that you do not use for any other
-> account or service. HTTPS is a planned deployment improvement.
-
-The demo runs in Docker on Amazon EC2. Its SQLite database is intentionally
-ephemeral, so accounts and tasks may be reset when the application is
-redeployed.
+The demo runs in Docker on Amazon EC2, with Caddy providing HTTPS and proxying
+traffic to the containerized application. Its SQLite database is intentionally
+ephemeral, so accounts and tasks may be reset when the application is redeployed.
 
 ## What it does
 
@@ -33,7 +29,7 @@ redeployed.
 - **Database:** SQLite
 - **Authentication:** JWT
 - **Testing:** JUnit, REST Assured, Cucumber, and Selenium
-- **Deployment:** Docker Compose on Amazon EC2
+- **Deployment:** Docker Compose on Amazon EC2 with Caddy-managed HTTPS
 
 ## Project structure
 
