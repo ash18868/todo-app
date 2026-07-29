@@ -90,3 +90,9 @@ todoapp/frontend/src/environments/environment.ts
 !todoapp/frontend/src/environments/environment.development.ts
 !todoapp/frontend/src/environments/environment.ts
 todoapp/.env
+!todoapp/.env.example
+
+# Docker Compose reads deployment secrets from the repository root.
+.env
+.env.*
+!.env.example

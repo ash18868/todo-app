@@ -92,12 +92,15 @@ Open `http://localhost:4200` in a browser.
 
 ## Run with Docker
 
-Create `todoapp/.env` with a strong local JWT signing secret:
+For Docker Compose, create `.env` beside `docker-compose.yml` in the repository
+root:
 
 ```dotenv
 JWT_SECRET=replace-with-a-long-random-secret
+CORS_ALLOWED_ORIGINS=http://localhost:4200
 ```
 
+Docker Compose reads this file and passes the values into the backend container.
 The `.env` file is ignored and must never be committed. Then run this command
 from the repository root:
 
