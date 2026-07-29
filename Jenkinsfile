@@ -12,17 +12,12 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Backend tests') {
             steps {
                 dir('todoapp') {
                     withEnv(["JWT_SECRET=${env.TEST_JWT_SECRET}"]) {
                         sh '''
+                            chmod +x gradlew
                             ./gradlew test --no-daemon \
                               --tests 'com.teamtetra.todoapp.TodoappApplicationTests' \
                               --tests 'com.teamtetra.todoapp.rest.RestAssuredTests'
