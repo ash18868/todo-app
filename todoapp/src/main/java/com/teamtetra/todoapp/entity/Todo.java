@@ -45,9 +45,7 @@ public class Todo {
 
     @Column(nullable = false)
     private String title;
+
     @Column(nullable = false)
     private boolean completed;
-    // @ManyToOne
-    // @JoinColumn(name = "id", nullable = false)
-    // private User user;
 }

@@ -47,11 +47,6 @@ public class Subtask {
     private String title; // The subtask name/title
 
     @Column(nullable = false) // Column cannot be null in the database
-    private boolean completed = false; // Subtask starts as not completed
-
-
-//     @ManyToOne(fetch = FetchType.LAZY, optional = false) // Many subtasks belong to one Todo
-//     @JoinColumn(name = "todo_id", nullable = false) // Creates foreign key column todo_id
-//     private Todo todo; // The Todo that this subtask belongs to
+    private boolean completed;
  }
 
