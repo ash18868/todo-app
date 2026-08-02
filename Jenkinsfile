@@ -60,6 +60,54 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy') {
+            steps {
+                withCredentials([
+                    string(
+                        credentialsId: 'todo-app-prod-jwt-secret',
+                        variable: 'PROD_JWT_SECRET'
+                    )
+                ]) {
+                    sh '''
+                        export JWT_SECRET="$PROD_JWT_SECRET"
+                        export CORS_ALLOWED_ORIGINS="http://localhost:4200"
+
+                        docker compose \
+                        --project-name todo-app-prod \
+                        up -d \
+                        --no-build \
+                        --force-recreate \
+                        --remove-orphans
+                    '''
+                }
+            }
+        }
+
+        stage('Verify deployment') {
+            steps {
+                sh '''
+                    attempts=0
+
+                    until curl --fail --silent http://localhost:8080/actuator/health
+                    do
+                        attempts=$((attempts + 1))
+
+                        if [ "$attempts" -ge 12 ]; then
+                            echo "Backend failed its health check"
+                            docker compose --project-name todo-app-prod ps
+                            docker compose --project-name todo-app-prod logs --tail=100
+                            exit 1
+                        fi
+
+                        sleep 5
+                    done
+
+                    curl --fail --silent http://localhost:4200/ > /dev/null
+                    echo "Deployment verified successfully."
+                '''
+            }
+        }
     }
 
     post {
@@ -67,7 +115,7 @@ pipeline {
             junit allowEmptyResults: true, testResults: 'todoapp/build/test-results/test/*.xml'
         }
         success {
-            echo 'CI passed. Deployment remains manual.'
+            echo 'CI passed and deployment completed successfully.'
         }
     }
 }
