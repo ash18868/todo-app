@@ -71,7 +71,7 @@ pipeline {
                 ]) {
                     sh '''
                         export JWT_SECRET="$PROD_JWT_SECRET"
-                        export CORS_ALLOWED_ORIGINS="http://localhost:4200,http://127.0.0.1:4200"
+                        export CORS_ALLOWED_ORIGINS="https://todo.webweaver.dev,http://localhost:4200,http://127.0.0.1:4200"
 
                         docker compose \
                         --project-name todo-app-prod \
