@@ -27,7 +27,7 @@ public class AuthService {
 
     public AuthResponse registerUser(RegisterRequest request){
         // Check username
-        if(isUnique(request.username())) throw new RegistrationFailure("Username must be unique");
+        if(isUnique(request.username())) throw new RegistrationFailure("Username has already been taken");
         // Check password
         if(!hasRequiredCharacters(request.password())) throw new RegistrationFailure("Password must include at least one uppercase, one lowercase, one number, one special character");
 
