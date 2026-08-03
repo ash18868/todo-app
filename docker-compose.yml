@@ -9,6 +9,9 @@ services:
     environment:
       JWT_SECRET: ${JWT_SECRET}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
+      DATABASE_URL: jdbc:sqlite:/data/todo.db?foreign_keys=on
+    volumes:
+      - backend-data:/data
 
   frontend:
     image: todo-app-frontend:latest
@@ -22,3 +25,6 @@ services:
       BACKEND_PORT: "8080"
     depends_on:
       - backend
+
+volumes:
+  backend-data:
